@@ -9,6 +9,7 @@ for (let i = 0; i < gridSize * gridSize; i++) {
 }
 
 const start = { x: 0, y: 0 };
+const startDirection = 0; // Initial direction. Directions set clockwise: 0 = North, 1 = East, 2 = South, 3 = West
 
 const givenMoves = [
   "R1",
@@ -182,11 +183,12 @@ const directions = [
  * Based on moves provided in givenMoves array, loop through all items in the array to produce the destination coordinates.
  * These coordinates will, then, be used to calculate the shortest path.
  * @param moves
+ * @param startDirection
  * @returns {{x: number, y: number}}
  */
-const calculateFinalCoordinates = (moves) => {
+const calculateFinalCoordinates = (moves, startDirection) => {
   let x = 0, y = 0;
-  let directionIndex = 0; // Initial direction. Directions set clockwise: 0 = North, 1 = East, 2 = South, 3 = West
+  let directionIndex = startDirection; // Initial direction. Directions set clockwise: 0 = North, 1 = East, 2 = South, 3 = West
 
   for (let move of moves) {
     let turn = move[0]; // Take the first substring R or L
@@ -282,14 +284,18 @@ const shortestPath = (start, destination) => {
   return path;
 };
 
-// Calculate total number of steps
+/**
+ * Calculate total number of steps, based on the moves provided
+ * @param moves
+ * @returns {number}
+ */
 const calculateSteps = (moves) => {
   let totalSteps = 0;
 
   // Loop through each move in the array
   for (let move of moves) {
     // Extract the numeric part (steps) from the string
-    let steps = parseInt(move.slice(1)); // slice(1) removes the direction ("R" or "L"), parseInt converts it to a number
+    let steps = parseInt(move.slice(1));
 
     // Add the steps to the total
     totalSteps += steps;
@@ -298,15 +304,18 @@ const calculateSteps = (moves) => {
   return totalSteps;
 };
 
+/**
+ * Draw path in HTML grid
+ * @param startPosition
+ * @param path
+ * @param color
+ */
 const drawPath = (startPosition, path, color) => {
-
-  console.log('Path: ', path);
 
   let x = 0;
   let y = 0;
-  let directionIndex = startPosition; // 0 = North, 1 = East, 2 = South, 3 = West
+  let directionIndex = startPosition;
 
-  // Color the starting point black
   let startIndex = x + (gridSize / 2) + (y + (gridSize / 2)) * gridSize; // Adjust grid size
 
   path.forEach((move) => {
@@ -321,8 +330,6 @@ const drawPath = (startPosition, path, color) => {
     } else if (turn === "S") {
       directionIndex = startPosition;
     }
-
-    console.log('directionIndex: ', directionIndex);
 
     // Move according to the updated directionIndex
     for (let step = 0; step < steps; step++) {
@@ -344,20 +351,53 @@ const drawPath = (startPosition, path, color) => {
   }
 };
 
-let finalCoordinates = calculateFinalCoordinates(givenMoves);
-let shortestPathArray = shortestPath(start, finalCoordinates);
-let totalSteps = calculateSteps(shortestPathArray);
+/**
+ * Calculate alternative shortest path by setting a new start direction, based on the first move in the shortest path,
+ * and adjusting moves accordingly.
+ * @param startPosition
+ * @param shortestPath
+ * @returns {{startDirection: number, altPath: *[]}}
+ */
+const calculateAlternativeRoute = (startPosition, shortestPath) => {
 
-// This path is another shortest path available. This, however, requires two turns before a move in desired direction
-// is made. Therefore, there is only one path that is fully optimal to reach destination coordinates, and that path is
-// present in the shortestPathArray.
-const alternativePath = ["R100", "L154"];
+  let directionIndex;
+  let alternativePath = [];
+
+  if (shortestPath[0][0] === 'R') {
+    directionIndex = (startPosition + 1) % 4;
+    alternativePath.push(`R${shortestPath[1].slice(1)}`);
+    alternativePath.push(`L${shortestPath[0].slice(1)}`);
+  } else {
+    directionIndex = (startPosition + 3) % 4;
+    alternativePath.push(`L${shortestPath[1].slice(1)}`);
+    alternativePath.push(`R${shortestPath[0].slice(1)}`);
+  }
+
+  return {
+    startDirection: directionIndex,
+    altPath: alternativePath
+  };
+};
+
+let finalCoordinates = calculateFinalCoordinates(givenMoves, startDirection);
+let shortestPathArray = shortestPath(start, finalCoordinates);
+let alternativePathConfig = calculateAlternativeRoute(startDirection, shortestPathArray);
+let initialPathSteps = calculateSteps(givenMoves);
+let totalSteps = calculateSteps(shortestPathArray);
+let totalAltSteps = calculateSteps(alternativePathConfig.altPath);
 
 console.log('Final coordinates: ', finalCoordinates);
 console.log("Shortest path: ", shortestPathArray);
 console.log("Number of steps: ", totalSteps);
+console.log("Number of steps init: ", initialPathSteps);
 
-// Draw the paths
-drawPath(0, givenMoves, "path-a");
-drawPath(0, shortestPathArray, "path-b");
-drawPath(1, alternativePath, "path-c");
+let first_paragraph = document.getElementById("given-path");
+let second_paragraph = document.getElementById("shortest-path");
+let third_paragraph = document.getElementById("alternative-shortest-path");
+first_paragraph.innerText = `${initialPathSteps} steps`;
+second_paragraph.innerText = `${totalSteps} steps`;
+third_paragraph.innerText = `${totalAltSteps} steps`;
+
+drawPath(startDirection, givenMoves, "path-a");
+drawPath(startDirection, shortestPathArray, "path-b");
+drawPath(alternativePathConfig.startDirection, alternativePathConfig.altPath, "path-c");
