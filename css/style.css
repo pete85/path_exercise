@@ -1,0 +1,31 @@
+.paths-legend {
+  padding: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(401, 3px); /* Increased size */
+  grid-template-rows: repeat(401, 3px); /* Increased size */
+  gap: 1px;
+  border: 1px solid #333;
+  position: relative;
+  background-color: #f0f0f0;
+  margin: 20px;
+}
+.grid-item {
+  width: 3px; /* Increased size */
+  height: 3px; /* Increased size */
+  border: 1px solid #ddd;
+}
+.start-point {
+  background-color: black;
+}
+.path-a {
+  background-color: red;
+}
+.path-b {
+  background-color: blue;
+}
+.path-c {
+  background-color: green;
+}
