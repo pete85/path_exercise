@@ -1,5 +1,24 @@
 .paths-legend {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  width: 30%;
+}
+
+.paths-legend > div {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-items: center;
+  justify-content: space-between;
+}
+
+.legend-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
 }
 
 .grid {
@@ -21,11 +40,11 @@
   background-color: black;
 }
 .path-a {
-  background-color: red;
+  background-color: #e0372a;
 }
 .path-b {
-  background-color: blue;
+  background-color: #2195d1;
 }
 .path-c {
-  background-color: green;
+  background-color: #3bd121;
 }
