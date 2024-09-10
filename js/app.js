@@ -12,29 +12,6 @@ const start = { x: 0, y: 0 };
 const startDirection = 0; // Initial direction. Directions set clockwise: 0 = North, 1 = East, 2 = South, 3 = West
 
 const givenMoves = [
-  "R1",
-  "R1",
-  "R3",
-  "R1",
-  "R1",
-  "L2",
-  "R5",
-  "L2",
-  "R5",
-  "R1",
-  "R4",
-  "L2",
-  "R3",
-  "L3",
-  "R4",
-  "L5",
-  "R4",
-  "R4",
-  "R1",
-  "L5",
-  "L4",
-  "R5",
-  "R3",
   "L1",
   "R4",
   "R3",
@@ -363,14 +340,22 @@ const calculateAlternativeRoute = (startPosition, shortestPath) => {
   let directionIndex;
   let alternativePath = [];
 
-  if (shortestPath[0][0] === 'R') {
-    directionIndex = (startPosition + 1) % 4;
-    alternativePath.push(`R${shortestPath[1].slice(1)}`);
-    alternativePath.push(`L${shortestPath[0].slice(1)}`);
-  } else {
+  if (shortestPath[0][0] === 'R' && shortestPath[1][0] === 'R') {
     directionIndex = (startPosition + 3) % 4;
     alternativePath.push(`L${shortestPath[1].slice(1)}`);
+    alternativePath.push(`L${shortestPath[0].slice(1)}`);
+  } else if (shortestPath[0][0] === 'R' && shortestPath[1][0] === 'L') {
+    directionIndex = (startPosition + 3) % 4;
+    alternativePath.push(`R${shortestPath[1].slice(1)}`);
     alternativePath.push(`R${shortestPath[0].slice(1)}`);
+  } else if (shortestPath[0][0] === 'L' && shortestPath[1][0] === 'L') {
+    directionIndex = (startPosition + 1) % 4;
+    alternativePath.push(`R${shortestPath[1].slice(1)}`);
+    alternativePath.push(`R${shortestPath[0].slice(1)}`);
+  } else if (shortestPath[0][0] === 'L' && shortestPath[1][0] === 'R') {
+    directionIndex = (startPosition + 1) % 4;
+    alternativePath.push(`L${shortestPath[1].slice(1)}`);
+    alternativePath.push(`L${shortestPath[0].slice(1)}`);
   }
 
   return {
