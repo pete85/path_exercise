@@ -247,7 +247,6 @@ const shortestPath = (start, destination) => {
     // Move East
     let steps = destination.x - x;
     path[path.length - 1] += `${steps}`; // Concatenate steps with last turn
-    x += steps;
   } else if (destination.x < x) {
     // Turn left to face West if we're not already facing West
     if (direction === "North") turnLeft();
@@ -256,7 +255,6 @@ const shortestPath = (start, destination) => {
     // Move West
     let steps = x - destination.x;
     path[path.length - 1] += `${steps}`; // Concatenate steps with last turn
-    x -= steps;
   }
 
   // Now move along the Y-axis
@@ -268,7 +266,6 @@ const shortestPath = (start, destination) => {
     // Move North
     let steps = destination.y - y;
     path[path.length - 1] += `${steps}`; // Concatenate steps with last turn
-    y += steps;
   } else if (destination.y < y) {
     // If facing East/West, turn to face South
     if (direction === "East") turnRight();
@@ -277,7 +274,6 @@ const shortestPath = (start, destination) => {
     // Move South
     let steps = y - destination.y;
     path[path.length - 1] += `${steps}`; // Concatenate steps with last turn
-    y -= steps;
   }
 
   // Return the path (turns and steps)
