@@ -16,6 +16,7 @@ let x = 0; // Logical coordinates start at the center
 let y = 0;
 let moves = []; // Store moves for drawing
 let finalCoordinates;
+let initialPathSteps;
 let startDirection = 0; // 0 = North, assuming you're starting facing North
 
 // Set initial path start position
@@ -66,6 +67,28 @@ const calculateFinalCoordinates = (moves, startDirection) => {
   return { x, y };
 };
 
+/**
+ * Calculate total number of steps, based on the moves provided
+ * @param moves
+ * @returns {number}
+ */
+const calculateSteps = (moves) => {
+  let totalSteps = 0;
+
+  // Loop through each move in the array
+  for (let move of moves) {
+    // Access the 'steps' property directly from the move object
+    let steps = move.steps;
+
+    // Add the steps to the total
+    totalSteps += steps;
+  }
+
+  console.log('Total steps: ', totalSteps);
+  return totalSteps;
+};
+
+
 
 // Handle arrow key presses to draw path
 document.addEventListener('keydown', (event) => {
@@ -100,6 +123,7 @@ document.addEventListener('keydown', (event) => {
       moves.push(move); // Add the move to the moves array
       drawPathOnCanvas(); // Redraw the path with the new move
       finalCoordinates = calculateFinalCoordinates(moves, startDirection); // Pass the startDirection into calculateFinalCoordinates
+      initialPathSteps = calculateSteps(moves);
     }
   }
 });
