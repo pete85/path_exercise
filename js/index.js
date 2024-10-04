@@ -21,6 +21,7 @@ let shortestPathSteps;
 let shortestPathArray;
 let movesForCalculateSteps;
 let startDirection = 0; // 0 = North, assuming you're starting facing North
+let drawingStarted = false;
 
 // Set initial path start position
 ctx.beginPath();
@@ -237,6 +238,11 @@ document.addEventListener('keydown', (event) => {
   let nextX = x;
   let nextY = y;
 
+  if (!drawingStarted) {
+    clearCenterDot();
+    drawingStarted = true; // Mark that drawing has started
+  }
+
   if (event.key === 'ArrowUp') {
     nextY -= 1; // Check next position for North
     move = {direction: 0, steps: 1}; // Move north
@@ -278,3 +284,26 @@ document.getElementById('drawShortestPathBtn').addEventListener('click', () => {
   // Draw the shortest path in blue
   drawShortestPath();
 });
+
+const drawCenterDot = () => {
+  const radius = 5; // Radius of the red dot
+  ctx.beginPath();
+  ctx.arc(offsetX, offsetY, radius, 0, Math.PI * 2, false);
+  ctx.fillStyle = 'red';
+  ctx.fill();
+  ctx.closePath();
+
+  // Apply CSS animation by temporarily creating an overlay canvas for the dot
+  canvas.classList.add('centerDot');
+};
+
+// Clear the dot once the user starts drawing
+const clearCenterDot = () => {
+  ctx.clearRect(offsetX - 10, offsetY - 10, 20, 20); // Clear the dot
+  canvas.classList.remove('centerDot'); // Stop the animation
+};
+
+// On page load, draw the center dot
+window.onload = () => {
+  drawCenterDot();
+};

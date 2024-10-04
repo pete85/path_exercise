@@ -16,6 +16,10 @@ canvas {
   background-color: white; /* Optional to ensure contrast */
 }
 
+.centerDot {
+  animation: fade 1.5s infinite ease-in-out;
+}
+
 .paths-legend-item {
   width: 100%;
   display: flex;
@@ -51,4 +55,16 @@ canvas {
 }
 .path-c {
   background-color: #3bd121;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
 }
