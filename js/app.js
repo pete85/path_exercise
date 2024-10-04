@@ -1,8 +1,10 @@
 const grid = document.getElementById("grid");
 const gridSize = 400;
 
-// Create grid items in HTML template
-for (let i = 0; i < gridSize * gridSize; i++) {
+const totalGridItems = gridWidth * gridHeight; // Dynamically set total grid items
+grid.innerHTML = ""; // Clear the existing grid
+
+for (let i = 0; i < totalGridItems; i++) {
   const div = document.createElement("div");
   div.classList.add("grid-item");
   grid.appendChild(div);
@@ -188,25 +190,35 @@ const directions = [
  */
 const calculateFinalCoordinates = (moves, startDirection) => {
   let x = 0, y = 0;
-  let directionIndex = startDirection; // Initial direction. Directions set clockwise: 0 = North, 1 = East, 2 = South, 3 = West
+  let directionIndex = startDirection;
+  let minX = 0, maxX = 0, minY = 0, maxY = 0;
 
   for (let move of moves) {
-    let turn = move[0]; // Take the first substring R or L
-    let steps = parseInt(move.slice(1)); // Number of steps
+    let turn = move[0]; // R or L
+    let steps = parseInt(move.slice(1)); // Steps
 
-    // Update the direction based on the turn
     if (turn === "R") {
-      directionIndex = (directionIndex + 1) % 4; // Turn right (modulo operator in place to ensure we stay within the 0 - 3 range)
+      directionIndex = (directionIndex + 1) % 4;
     } else if (turn === "L") {
-      directionIndex = (directionIndex + 3) % 4; // Turn left (+3 used to avoid negative values)
+      directionIndex = (directionIndex + 3) % 4;
     }
 
+    // Update coordinates
     x += directions[directionIndex].dx * steps;
     y += directions[directionIndex].dy * steps;
+
+    // Track boundaries
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
+
+    console.log(`Move: ${move}, x: ${x}, y: ${y}, minX: ${minX}, maxX: ${maxX}, minY: ${minY}, maxY: ${maxY}`);
   }
 
-  return { x, y };
+  return { x, y, minX, maxX, minY, maxY };
 };
+
 
 /**
  * Based on the start coordinates and destination coordinates calculate the shortest path
@@ -219,6 +231,10 @@ const shortestPath = (start, destination) => {
   let y = start.y;
   let direction = "North";
   let path = [];
+
+  console.log('Starting shortest path calculation');
+  console.log('Start coordinates:', start);
+  console.log('Destination coordinates:', destination);
 
   // With given direction, turn right in the direction set
   const turnRight = () => {
@@ -306,36 +322,29 @@ const calculateSteps = (moves) => {
  * @param path
  * @param color
  */
-const drawPath = (startPosition, path, color) => {
-
+const drawPath = (startPosition, path, color, boundaries) => {
   let x = 0;
   let y = 0;
   let directionIndex = startPosition;
 
-  let startIndex = x + (gridSize / 2) + (y + (gridSize / 2)) * gridSize; // Adjust grid size
+  let startIndex = (x - boundaries.minX) + (boundaries.maxY - y) * gridWidth;
 
   path.forEach((move) => {
     let turn = move[0];
     let steps = parseInt(move.slice(1));
 
-    // Update directionIndex based on turn
     if (turn === "R") {
-      directionIndex = (directionIndex + 1) % 4; // Turn right
+      directionIndex = (directionIndex + 1) % 4;
     } else if (turn === "L") {
-      directionIndex = (directionIndex + 3) % 4; // Turn left
-    } else if (turn === "S") {
-      directionIndex = startPosition;
+      directionIndex = (directionIndex + 3) % 4;
     }
 
-    // Move according to the updated directionIndex
     for (let step = 0; step < steps; step++) {
-
       x += directions[directionIndex].dx;
       y += directions[directionIndex].dy;
 
-      let index = (x + gridSize - 330) + ((gridSize / 2) - y) * (gridSize + 1); // Adjust grid size
+      let index = (x - boundaries.minX) + (boundaries.maxY - y) * gridWidth;
       if (grid.children[index]) {
-
         grid.children[index].classList.add(color);
       }
     }
@@ -347,6 +356,7 @@ const drawPath = (startPosition, path, color) => {
   }
 };
 
+
 /**
  * Calculate alternative shortest path by setting a new start direction, based on the first move in the shortest path,
  * and adjusting moves accordingly.
@@ -355,10 +365,19 @@ const drawPath = (startPosition, path, color) => {
  * @returns {{startDirection: number, altPath: *[]}}
  */
 const calculateAlternativeRoute = (startPosition, shortestPath) => {
-
   let directionIndex;
   let alternativePath = [];
 
+  // Ensure shortestPath has at least two elements
+  if (shortestPath.length < 2) {
+    console.error('Shortest path does not have enough elements:', shortestPath);
+    return {
+      startDirection: startPosition,
+      altPath: [] // Return an empty alternative path
+    };
+  }
+
+  // Proceed with alternative route calculation
   if (shortestPath[0][0] === 'R' && shortestPath[1][0] === 'R') {
     directionIndex = (startPosition + 3) % 4;
     alternativePath.push(`L${shortestPath[1].slice(1)}`);
@@ -383,14 +402,20 @@ const calculateAlternativeRoute = (startPosition, shortestPath) => {
   };
 };
 
+
 let finalCoordinates = calculateFinalCoordinates(givenMoves, startDirection);
+console.log('Final destination coordinates:', finalCoordinates);
 let shortestPathArray = shortestPath(start, finalCoordinates);
 let alternativePathConfig = calculateAlternativeRoute(startDirection, shortestPathArray);
 let initialPathSteps = calculateSteps(givenMoves);
 let totalSteps = calculateSteps(shortestPathArray);
 let totalAltSteps = calculateSteps(alternativePathConfig.altPath);
+const gridWidth = finalCoordinates.maxX - finalCoordinates.minX + 1;
+const gridHeight = finalCoordinates.maxY - finalCoordinates.minY + 1;
 
-console.log('Final coordinates: ', finalCoordinates);
+grid.style.gridTemplateColumns = `repeat(${gridWidth}, 3px)`;
+grid.style.gridTemplateRows = `repeat(${gridHeight}, 3px)`;
+
 console.log("Shortest path: ", shortestPathArray);
 console.log("Number of steps: ", totalSteps);
 console.log("Number of steps init: ", initialPathSteps);
@@ -402,6 +427,7 @@ first_paragraph.innerText = `${initialPathSteps} steps`;
 second_paragraph.innerText = `${totalSteps} steps`;
 third_paragraph.innerText = `${totalAltSteps} steps`;
 
-drawPath(startDirection, givenMoves, "path-a");
-drawPath(startDirection, shortestPathArray, "path-b");
-drawPath(alternativePathConfig.startDirection, alternativePathConfig.altPath, "path-c");
+drawPath(startDirection, givenMoves, "path-a", finalCoordinates);
+drawPath(startDirection, shortestPathArray, "path-b", finalCoordinates);
+drawPath(alternativePathConfig.startDirection, alternativePathConfig.altPath, "path-c", finalCoordinates);
+
