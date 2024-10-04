@@ -35,9 +35,9 @@ canvas {
 }
 
 .legend-item {
-  width: 20px;
+  width: 50px;
   height: 20px;
-  border-radius: 50%;
+  border-radius: 6px;
 }
 
 .start-point {
