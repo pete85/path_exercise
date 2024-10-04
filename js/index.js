@@ -15,6 +15,8 @@ const directions = [
 let x = 0; // Logical coordinates start at the center
 let y = 0;
 let moves = []; // Store moves for drawing
+let finalCoordinates;
+let startDirection = 0; // 0 = North, assuming you're starting facing North
 
 // Set initial path start position
 ctx.beginPath();
@@ -46,6 +48,24 @@ const drawPathOnCanvas = () => {
   ctx.strokeStyle = 'red'; // Set the color of the path
   ctx.stroke();
 };
+
+const calculateFinalCoordinates = (moves, startDirection) => {
+  let x = 0, y = 0;
+  let directionIndex = startDirection; // Initial direction. Directions set clockwise: 0 = North, 1 = East, 2 = South, 3 = West
+
+  for (let move of moves) {
+    const { direction, steps } = move; // Extract direction and steps directly
+
+    // Since the moves array already stores directions, we don't need to handle "R" or "L" logic here.
+    // We can just update x and y based on the current direction.
+    x += directions[direction].dx * steps;
+    y += directions[direction].dy * steps;
+  }
+
+  console.log(`Final X: ${x}, Final Y: ${y}`);
+  return { x, y };
+};
+
 
 // Handle arrow key presses to draw path
 document.addEventListener('keydown', (event) => {
@@ -79,6 +99,7 @@ document.addEventListener('keydown', (event) => {
     if (move) {
       moves.push(move); // Add the move to the moves array
       drawPathOnCanvas(); // Redraw the path with the new move
+      finalCoordinates = calculateFinalCoordinates(moves, startDirection); // Pass the startDirection into calculateFinalCoordinates
     }
   }
 });
