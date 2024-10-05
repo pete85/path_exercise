@@ -17,13 +17,15 @@ let y = 0;
 let moves = []; // Store moves for drawing
 let finalCoordinates;
 let initialPathSteps;
+let shortestPath;
 let shortestPathSteps;
-let shortestPathArray;
-let shortestAltPath;
-let movesForCalculateSteps;
-let movesForCalculateAltSteps;
 let startDirection = 0; // 0 = North, assuming you're starting facing North
 let drawingStarted = false;
+
+let mainPathStepsText = document.getElementById("given-path");
+let shortestPathStepsText = document.getElementById("shortest-path");
+let stepsText;
+let shortestStepsText;
 
 // Set initial path start position
 ctx.beginPath();
@@ -53,30 +55,6 @@ const drawPathOnCanvas = () => {
   }
 
   ctx.strokeStyle = 'red'; // Set the color of the initial path
-  ctx.stroke();
-};
-
-// Draw the shortest path in blue
-const drawShortestPath = () => {
-  ctx.beginPath();
-  ctx.moveTo(offsetX, offsetY); // Start from the center of the canvas
-  let posX = 0;
-  let posY = 0;
-
-  // Draw the shortest path based on the shortestPathArray
-  for (const move of movesForCalculateSteps) {
-    const directionIndex = move.direction;
-    const steps = move.steps;
-
-    // Update position based on direction
-    posX += directions[directionIndex].dx * steps;
-    posY += directions[directionIndex].dy * steps;
-
-    // Draw the line to the new position
-    ctx.lineTo(offsetX + posX * cellSize, offsetY + posY * cellSize);
-  }
-
-  ctx.strokeStyle = 'blue'; // Set the color for the shortest path
   ctx.stroke();
 };
 
@@ -111,93 +89,10 @@ const calculateSteps = (moves) => {
     // Add the steps to the total
     totalSteps += steps;
   }
-
-  console.log('moves provided: ', moves);
-  console.log('Total steps: ', totalSteps);
   return totalSteps;
 };
 
-/**
- * Based on the start coordinates and destination coordinates calculate the shortest path
- * @param startX
- * @param startY
- * @param destination
- * @returns {*[]}
- */
-const setShortestPath = (startX, startY, destination) => {
-  let x = startX;
-  let y = startY;
-  let direction = "North"; // Start facing North
-  let path = [];
-
-  // With given direction, turn right to face East
-  const turnRight = () => {
-    if (direction === "North") direction = "East";
-    else if (direction === "East") direction = "South";
-    else if (direction === "South") direction = "West";
-    else if (direction === "West") direction = "North";
-  };
-
-  // With given direction, turn left
-  const turnLeft = () => {
-    if (direction === "North") direction = "West";
-    else if (direction === "West") direction = "South";
-    else if (direction === "South") direction = "East";
-    else if (direction === "East") direction = "North";
-  };
-
-  // Move along the X-axis first
-  if (destination.x > x) {
-    // Turn to face East if not already facing East
-    while (direction !== "East") {
-      turnRight();
-    }
-
-    // Move East
-    let steps = destination.x - x;
-    path.push(`R${steps}`);
-    x = destination.x; // Update the x coordinate
-  } else if (destination.x < x) {
-    // Turn to face West if not already facing West
-    while (direction !== "West") {
-      turnLeft();
-    }
-
-    // Move West
-    let steps = x - destination.x;
-    path.push(`L${steps}`);
-    x = destination.x; // Update the x coordinate
-  }
-
-  // Move along the Y-axis
-  if (destination.y > y) {
-    // Turn to face South if not already facing South
-    while (direction !== "South") {
-      turnRight();
-    }
-
-    // Move South
-    let steps = destination.y - y;
-    path.push(`R${steps}`);
-    y = destination.y; // Update the y coordinate
-  } else if (destination.y < y) {
-    // Turn to face North if not already facing North
-    while (direction !== "North") {
-      turnLeft();
-    }
-
-    // Move North
-    let steps = y - destination.y;
-    path.push(`L${steps}`);
-    y = destination.y; // Update the y coordinate
-  }
-
-  console.log('Shortest path: ', path);
-
-  return path;
-};
-
-const calculateAlternativeShortestPath = (startX, startY, finalX, finalY, startDirection, shortestPath) => {
+const setShortestPath = (startX, startY, finalX, finalY, startDirection) => {
   let x = startX;
   let y = startY;
   let direction = startDirection; // Starting direction (0 = North, 1 = East, 2 = South, 3 = West)
@@ -263,6 +158,20 @@ const calculateAlternativeShortestPath = (startX, startY, finalX, finalY, startD
     y = finalY; // Update y coordinate
   }
 
+  alternativePath = alternativePath.filter(move => move.steps > 0);
+  console.log('ALT path: ', alternativePath);
+  shortestPathSteps = calculateSteps(alternativePath);
+
+  console.log('shortestPathSteps: ', shortestPathSteps);
+
+  if (shortestPathSteps === 1) {
+    shortestStepsText = 'step';
+  } else {
+    shortestStepsText = 'steps';
+  }
+
+  shortestPathStepsText.innerText = `${shortestPathSteps} ${shortestStepsText}`
+
   return alternativePath;
 };
 
@@ -286,50 +195,14 @@ const drawAlternativePath = (alternativePath) => {
     ctx.lineTo(offsetX + posX * cellSize, offsetY + posY * cellSize);
   }
 
-  ctx.strokeStyle = 'green'; // Set the color for the alternative path
+  ctx.strokeStyle = 'blue'; // Set the color for the alternative path
   ctx.stroke();
 };
 
-
-
-
-
-// Helper function to convert the path to the expected format for calculateSteps
-const convertPathToMoves = (path, moves) => {
-  let initialDirection = moves[0].direction; // Extract the initial direction from the first object in "moves"
-  let currentDirection = initialDirection; // Start with the initial direction
-
-  const directions = ["North", "East", "South", "West"]; // Directions in clockwise order
-
-  // Function to turn right
-  const turnRight = () => {
-    currentDirection = (currentDirection + 1) % 4; // Turn right (clockwise)
-  };
-
-  // Function to turn left
-  const turnLeft = () => {
-    currentDirection = (currentDirection + 3) % 4; // Turn left (counterclockwise)
-  };
-
-  // Convert path array into moves format
-  return path.map(move => {
-    const directionChar = move[0]; // 'R' or 'L'
-    const steps = parseInt(move.slice(1)); // Extract the number of steps
-
-    if (directionChar === 'R') {
-      turnRight(); // Turn right modifies the current direction
-    } else if (directionChar === 'L') {
-      turnLeft(); // Turn left modifies the current direction
-    }
-
-    return {
-      direction: currentDirection, // Use the updated current direction
-      steps: steps
-    };
-  });
+const updateDrawButtonState = () => {
+  const drawButton = document.getElementById('drawShortestPathBtn');
+  drawButton.disabled = initialPathSteps.length === 0;
 };
-
-
 
 // Handle arrow key presses to draw path
 document.addEventListener('keydown', (event) => {
@@ -370,26 +243,39 @@ document.addEventListener('keydown', (event) => {
       drawPathOnCanvas(); // Redraw the path with the new move
       finalCoordinates = calculateFinalCoordinates(moves, startDirection); // Assign the final coordinates here
       initialPathSteps = calculateSteps(moves);
-      shortestPathArray = setShortestPath(0, 0, finalCoordinates);
-      // shortestAltPath = calculateAlternativeShortestPath(0, 0, finalCoordinates.x, finalCoordinates.y, startDirection, shortestPathArray);
-      movesForCalculateSteps = convertPathToMoves(shortestPathArray, moves);
+      updateDrawButtonState();
+      drawingStarted = false;
+      shortestPath = setShortestPath(0, 0, finalCoordinates.x, finalCoordinates.y, startDirection);
 
-      console.log('SHORTEST PATH: ', shortestPathArray);
-      console.log('SHORTEST PATH ALT: ', shortestPathArray);
+      if (initialPathSteps === 1) {
+        stepsText = 'step';
+      } else {
+        stepsText = 'steps';
+      }
 
-      console.log('movesForCalculateSteps: ', movesForCalculateSteps);
+      mainPathStepsText.innerText = `${initialPathSteps} ${stepsText}`
     }
   }
 });
 
 // Add an event listener for the "Draw Shortest Path" button
 document.getElementById('drawShortestPathBtn').addEventListener('click', () => {
-  drawShortestPath();
-  // drawAlternativePath(shortestAltPath);
+  // drawShortestPath();
+  drawAlternativePath(shortestPath);
 });
 
 document.getElementById('resetPathsBtn').addEventListener('click', () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  moves = []; // Clear all moves
+  initialPathSteps = []; // Clear the initial path steps
+  shortestPathArray = []; // Clear the shortest path
+  shortestPath = [];
+
+  // Optionally, update the button state to reflect no paths
+  updateDrawButtonState();
+
+  console.log('Paths and canvas have been reset.');
+  drawCenterDot();
 });
 
 const drawCenterDot = () => {
