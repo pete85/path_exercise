@@ -19,6 +19,9 @@
   <link rel="apple-touch-icon" href="icon.png">
 
   <link rel="manifest" href="site.webmanifest">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
   <meta name="theme-color" content="#fafafa">
 </head>
 
@@ -34,21 +37,25 @@
   <div>
     <div class="paths-legend">
       <div class="paths-legend-item">
-        <h3>Path provided:</h3>
+        <div class="paths-legend-description">
+          <h3>Path provided:</h3>
+        </div>
         <div class="legend-container">
-          <p id="given-path"></p>
+          <h3 id="given-path"></h3>
           <div class="legend-item path-a"></div>
         </div>
       </div>
       <div class="paths-legend-item">
-        <h3>Shortest path:</h3>
+        <div class="paths-legend-description">
+          <h3>Shortest path:</h3>
+        </div>
         <div class="legend-container">
-          <p id="shortest-path"></p>
+          <h3 id="shortest-path"></h3>
           <div class="legend-item path-b"></div>
         </div>
       </div>
     </div>
-    <div>
+    <div class="buttons">
       <button id="drawShortestPathBtn" disabled>Draw Shortest Path</button>
       <button id="resetPathsBtn">Reset Paths</button>
     </div>

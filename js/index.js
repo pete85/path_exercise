@@ -1,9 +1,9 @@
 const canvas = document.getElementById('gridCanvas');
 const ctx = canvas.getContext('2d'); // 2D context
-const cellSize = 10; // Size of each "grid cell"
-canvas.width = 600;
-canvas.height = 600;
-const offsetX = canvas.width / 2; // Start from the middle of the canvas
+const cellSize = 10;
+canvas.width = 500;
+canvas.height = 500;
+const offsetX = canvas.width / 2;
 const offsetY = canvas.height / 2;
 const directions = [
   {dx: 0, dy: -1}, // North (Up)
@@ -12,22 +12,19 @@ const directions = [
   {dx: -1, dy: 0}  // West (Left)
 ];
 
-let x = 0; // Logical coordinates start at the center
+let x = 0;
 let y = 0;
-let moves = []; // Store moves for drawing
+let moves = [];
 let finalCoordinates;
 let initialPathSteps;
 let shortestPath;
 let shortestPathSteps;
-let startDirection = 0; // 0 = North, assuming you're starting facing North
+let startDirection = 0;
 let drawingStarted = false;
-
 let mainPathStepsText = document.getElementById("given-path");
 let shortestPathStepsText = document.getElementById("shortest-path");
 let stepsText;
 let shortestStepsText;
-
-// Set initial path start position
 ctx.beginPath();
 ctx.moveTo(offsetX, offsetY);
 
@@ -204,6 +201,36 @@ const updateDrawButtonState = () => {
   drawButton.disabled = initialPathSteps.length === 0;
 };
 
+const drawCenterDot = () => {
+  const radius = 5; // Radius of the red dot
+  ctx.beginPath();
+  ctx.arc(offsetX, offsetY, radius, 0, Math.PI * 2, false);
+  ctx.fillStyle = 'red';
+  ctx.fill();
+  ctx.closePath();
+
+  // Apply CSS animation by temporarily creating an overlay canvas for the dot
+  canvas.classList.add('centerDot');
+};
+
+// Clear the dot once the user starts drawing
+const clearCenterDot = () => {
+  ctx.clearRect(offsetX - 10, offsetY - 10, 20, 20); // Clear the dot
+  canvas.classList.remove('centerDot'); // Stop the animation
+};
+
+const resetPath = () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  moves = []; // Clear all moves
+  initialPathSteps = []; // Clear the initial path steps
+  shortestPathArray = []; // Clear the shortest path
+  shortestPath = [];
+  updateDrawButtonState();
+  mainPathStepsText.innerText = '';
+  shortestPathStepsText.innerText = '';
+  drawCenterDot();
+}
+
 // Handle arrow key presses to draw path
 document.addEventListener('keydown', (event) => {
   let move = null;
@@ -234,13 +261,12 @@ document.addEventListener('keydown', (event) => {
     offsetX + nextX * cellSize >= 0 && offsetX + nextX * cellSize <= canvas.width &&
     offsetY + nextY * cellSize >= 0 && offsetY + nextY * cellSize <= canvas.height
   ) {
-    // Only make the move if it's within the canvas bounds
     x = nextX;
     y = nextY;
 
     if (move) {
-      moves.push(move); // Add the move to the moves array
-      drawPathOnCanvas(); // Redraw the path with the new move
+      moves.push(move);
+      drawPathOnCanvas();
       finalCoordinates = calculateFinalCoordinates(moves, startDirection); // Assign the final coordinates here
       initialPathSteps = calculateSteps(moves);
       updateDrawButtonState();
@@ -258,43 +284,13 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-// Add an event listener for the "Draw Shortest Path" button
 document.getElementById('drawShortestPathBtn').addEventListener('click', () => {
-  // drawShortestPath();
   drawAlternativePath(shortestPath);
 });
 
 document.getElementById('resetPathsBtn').addEventListener('click', () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  moves = []; // Clear all moves
-  initialPathSteps = []; // Clear the initial path steps
-  shortestPathArray = []; // Clear the shortest path
-  shortestPath = [];
-
-  // Optionally, update the button state to reflect no paths
-  updateDrawButtonState();
-
-  console.log('Paths and canvas have been reset.');
-  drawCenterDot();
+  resetPath();
 });
-
-const drawCenterDot = () => {
-  const radius = 5; // Radius of the red dot
-  ctx.beginPath();
-  ctx.arc(offsetX, offsetY, radius, 0, Math.PI * 2, false);
-  ctx.fillStyle = 'red';
-  ctx.fill();
-  ctx.closePath();
-
-  // Apply CSS animation by temporarily creating an overlay canvas for the dot
-  canvas.classList.add('centerDot');
-};
-
-// Clear the dot once the user starts drawing
-const clearCenterDot = () => {
-  ctx.clearRect(offsetX - 10, offsetY - 10, 20, 20); // Clear the dot
-  canvas.classList.remove('centerDot'); // Stop the animation
-};
 
 // On page load, draw the center dot
 window.onload = () => {
