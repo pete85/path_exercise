@@ -3,8 +3,7 @@ body {
   font-size: 15px;
   font-family: 'Montserrat', Helvetica Neue, sans-serif !important;
   margin: 0;
-  height: 100vh;
-  width: 100vw;
+  background-color: #94A3B8;
 }
 
 h1 {
@@ -37,25 +36,56 @@ h1, h2, h3, h4, p {
   margin: 0 !important;
 }
 
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  /*height: 100vh;*/
+  /*width: 100vw;*/
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
 .page-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   column-gap: 20px;
+  /*row-gap: 20px;*/
   margin: 0 auto;
   justify-content: center;
   align-items: center;
   background-color: #E2E8F0;
   height: 100%;
+  max-width: 1024px;
 }
 
-.canvas-container {
+.page-header {
+  padding-top: 20px;
+}
 
+.page-description, .canvas-container, .instructions-container, .buttons {
+  padding: 20px;
+}
+
+.body-container {
+  display: flex;
+  flex-direction: column;
+  column-gap: 20px;
+}
+
+@media screen and (min-width: 1024px) {
+  .body-container {
+    flex-direction: row;
+  }
 }
 
 .paths-legend {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  margin-bottom: 20px;
+  padding: 20px;
 }
 
 .paths-legend-description {
@@ -129,6 +159,10 @@ button {
   display: flex;
   flex-direction: row;
   column-gap: 20px;
+}
+
+ol li {
+  line-height: 1.8rem;
 }
 
 .start-point {

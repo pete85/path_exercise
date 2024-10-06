@@ -1,15 +1,13 @@
 const canvas = document.getElementById('gridCanvas');
 const ctx = canvas.getContext('2d'); // 2D context
 const cellSize = 10;
-canvas.width = 500;
-canvas.height = 500;
-const offsetX = canvas.width / 2;
-const offsetY = canvas.height / 2;
+let offsetX = canvas.width / 2;
+let offsetY = canvas.height / 2;
 const directions = [
-  {dx: 0, dy: -1}, // North (Up)
-  {dx: 1, dy: 0},  // East (Right)
-  {dx: 0, dy: 1},  // South (Down)
-  {dx: -1, dy: 0}  // West (Left)
+  { dx: 0, dy: -1 }, // North (Up)
+  { dx: 1, dy: 0 },  // East (Right)
+  { dx: 0, dy: 1 },  // South (Down)
+  { dx: -1, dy: 0 }  // West (Left)
 ];
 
 let x = 0;
@@ -27,6 +25,25 @@ let stepsText;
 let shortestStepsText;
 ctx.beginPath();
 ctx.moveTo(offsetX, offsetY);
+
+const resizeCanvas = () => {
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+
+  // Set the canvas size dynamically based on a percentage of screen size
+  canvas.width = Math.min(screenWidth * 0.8, 400); // 80% of the screen width or max 400px
+  canvas.height = Math.min(screenHeight * 0.8, 400); // 80% of the screen height or max 400px
+
+  // Update the offset to reflect the new canvas size
+  offsetX = canvas.width / 2;
+  offsetY = canvas.height / 2;
+
+  // Clear the canvas and redraw the center dot
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Redraw the center dot after resizing
+  drawCenterDot();
+};
 
 // Draw the current path
 const drawPathOnCanvas = () => {
@@ -156,17 +173,12 @@ const setShortestPath = (startX, startY, finalX, finalY, startDirection) => {
   }
 
   alternativePath = alternativePath.filter(move => move.steps > 0);
-  console.log('ALT path: ', alternativePath);
   shortestPathSteps = calculateSteps(alternativePath);
-
-  console.log('shortestPathSteps: ', shortestPathSteps);
-
   if (shortestPathSteps === 1) {
     shortestStepsText = 'step';
   } else {
     shortestStepsText = 'steps';
   }
-
   shortestPathStepsText.innerText = `${shortestPathSteps} ${shortestStepsText}`
 
   return alternativePath;
@@ -201,6 +213,7 @@ const updateDrawButtonState = () => {
   drawButton.disabled = initialPathSteps.length === 0;
 };
 
+// Function to draw the center dot
 const drawCenterDot = () => {
   const radius = 5; // Radius of the red dot
   ctx.beginPath();
@@ -296,3 +309,6 @@ document.getElementById('resetPathsBtn').addEventListener('click', () => {
 window.onload = () => {
   drawCenterDot();
 };
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
