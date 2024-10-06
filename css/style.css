@@ -90,7 +90,6 @@ h1, h2, h3, h4, p {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  margin-bottom: 20px;
   padding: 20px;
 }
 
@@ -176,18 +175,18 @@ ol li {
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 5px;
-  width: 100px; /* Adjust this to control the size */
-  height: 100px; /* Adjust this to control the size */
+  width: 150px; /* Adjust this to control the size */
+  height: 150px; /* Adjust this to control the size */
   justify-content: center;
   align-items: center;
-  margin: 20px auto; /* Centers the container horizontally */
+  margin: 10px auto; /* Centers the container horizontally */
 }
 
 .arrow-buttons-container button {
   width: 50px;
   height: 50px;
   font-size: 20px;
-  background-color: #1E3A8A; /* Button background color */
+  background-color: #262626; /* Button background color */
   color: white;
   border: none;
   cursor: pointer;
@@ -221,12 +220,12 @@ ol li {
 
 /* Button hover effects */
 .arrow-buttons-container button:hover {
-  background-color: #172554;
+  background-color: #525252;
 }
 
 /* Button active effects */
 .arrow-buttons-container button:active {
-  background-color: #172554;
+  background-color: #525252;
 }
 
 
