@@ -244,6 +244,59 @@ const resetPath = () => {
   drawCenterDot();
 }
 
+// Function to simulate arrow key behavior
+const simulateArrowKey = (direction) => {
+  let move = null;
+  let nextX = x;
+  let nextY = y;
+
+  if (!drawingStarted) {
+    clearCenterDot();
+    drawingStarted = true; // Mark that drawing has started
+  }
+
+  if (direction === 'ArrowUp') {
+    nextY -= 1; // Check next position for North
+    move = { direction: 0, steps: 1 }; // Move north
+  } else if (direction === 'ArrowRight') {
+    nextX += 1; // Check next position for East
+    move = { direction: 1, steps: 1 }; // Move east
+  } else if (direction === 'ArrowDown') {
+    nextY += 1; // Check next position for South
+    move = { direction: 2, steps: 1 }; // Move south
+  } else if (direction === 'ArrowLeft') {
+    nextX -= 1; // Check next position for West
+    move = { direction: 3, steps: 1 }; // Move west
+  }
+
+  // Check if the next move would go beyond the canvas borders
+  if (
+      offsetX + nextX * cellSize >= 0 && offsetX + nextX * cellSize <= canvas.width &&
+      offsetY + nextY * cellSize >= 0 && offsetY + nextY * cellSize <= canvas.height
+  ) {
+    x = nextX;
+    y = nextY;
+
+    if (move) {
+      moves.push(move);
+      drawPathOnCanvas();
+      finalCoordinates = calculateFinalCoordinates(moves, startDirection); // Assign the final coordinates here
+      initialPathSteps = calculateSteps(moves);
+      updateDrawButtonState();
+      drawingStarted = false;
+      shortestPath = setShortestPath(0, 0, finalCoordinates.x, finalCoordinates.y, startDirection);
+
+      if (initialPathSteps === 1) {
+        stepsText = 'step';
+      } else {
+        stepsText = 'steps';
+      }
+
+      mainPathStepsText.innerText = `${initialPathSteps} ${stepsText}`
+    }
+  }
+};
+
 // Handle arrow key presses to draw path
 document.addEventListener('keydown', (event) => {
   let move = null;
@@ -303,6 +356,19 @@ document.getElementById('drawShortestPathBtn').addEventListener('click', () => {
 
 document.getElementById('resetPathsBtn').addEventListener('click', () => {
   resetPath();
+});
+
+document.getElementById('arrowUpBtn').addEventListener('click', () => {
+  simulateArrowKey('ArrowUp');
+});
+document.getElementById('arrowRightBtn').addEventListener('click', () => {
+  simulateArrowKey('ArrowRight');
+});
+document.getElementById('arrowDownBtn').addEventListener('click', () => {
+  simulateArrowKey('ArrowDown');
+});
+document.getElementById('arrowLeftBtn').addEventListener('click', () => {
+  simulateArrowKey('ArrowLeft');
 });
 
 // On page load, draw the center dot

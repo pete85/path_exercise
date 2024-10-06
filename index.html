@@ -22,6 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+  <script src="https://kit.fontawesome.com/dd55e7005e.js" crossorigin="anonymous"></script>
   <meta name="theme-color" content="#fafafa">
 </head>
 
@@ -75,20 +76,20 @@
           <button id="resetPathsBtn">Reset Paths</button>
         </div>
         <div class="instructions-container">
-          <ol>
-            <li>Click anywhere on the canvas to focus.</li>
-            <li>Use the <strong>keyboard arrow keys</strong> to draw a path on the grid.
-              <ul>
-                <li>Each arrow key press moves one step in the corresponding direction.</li>
-              </ul>
-            </li>
-            <li>Once a path is drawn, you can:
-              <ul>
-                <li>Click the <strong>"Draw Shortest Path"</strong> button to calculate and visualize the shortest path from the starting point.</li>
-                <li>Click the <strong>"Reset Paths"</strong> button to clear the canvas and start over.</li>
-              </ul>
-            </li>
-          </ol>
+          <div class="arrow-buttons-container">
+            <button id="arrowUpBtn">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+            <button id="arrowLeftBtn">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button id="arrowDownBtn">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <button id="arrowRightBtn">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
 
         </div>
       </div>
