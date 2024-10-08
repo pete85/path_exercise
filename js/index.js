@@ -30,28 +30,24 @@ const resizeCanvas = () => {
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
 
-  // Set the canvas size dynamically based on a percentage of screen size
-  canvas.width = Math.min(screenWidth * 0.8, 400); // 80% of the screen width or max 400px
-  canvas.height = Math.min(screenHeight * 0.8, 400); // 80% of the screen height or max 400px
+  canvas.width = Math.min(screenWidth * 0.8, 400);
+  canvas.height = Math.min(screenHeight * 0.8, 400);
 
-  // Update the offset to reflect the new canvas size
   offsetX = canvas.width / 2;
   offsetY = canvas.height / 2;
 
-  // Clear the canvas and redraw the center dot
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Redraw the center dot after resizing
   drawCenterDot();
 };
 
-// Draw the current path
+/**
+ * Draw the main path on canvas. On desktop use keyboard arrows or buttons. On mobile use buttons
+ */
 const drawPathOnCanvas = () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before each draw
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Redraw the path starting from the fixed center
   ctx.beginPath();
-  ctx.moveTo(offsetX, offsetY); // Always start from the center of the canvas
+  ctx.moveTo(offsetX, offsetY);
 
   let posX = 0;
   let posY = 0;
@@ -68,23 +64,27 @@ const drawPathOnCanvas = () => {
     ctx.lineTo(offsetX + posX * cellSize, offsetY + posY * cellSize);
   }
 
-  ctx.strokeStyle = 'red'; // Set the color of the initial path
+  ctx.strokeStyle = 'red';
   ctx.stroke();
 };
 
-const calculateFinalCoordinates = (moves, startDirection) => {
+/**
+ * Based on the main path generated, calculate the final coordinates. These are used for calculating the shortest path.
+ * @param moves
+ * @returns {{x: number, y: number}}
+ */
+const calculateFinalCoordinates = (moves) => {
   let xCoord = 0, yCoord = 0;
-  let directionIndex = startDirection; // Initial direction. Directions set clockwise: 0 = North, 1 = East, 2 = South, 3 = West
 
   for (let move of moves) {
-    const {direction, steps} = move; // Extract direction and steps directly
+    const {direction, steps} = move;
 
     xCoord += directions[direction].dx * steps;
     yCoord += directions[direction].dy * steps;
   }
 
   console.log(`Final X: ${xCoord}, Final Y: ${yCoord}`);
-  return {x: xCoord, y: yCoord};  // Return the final coordinates correctly
+  return {x: xCoord, y: yCoord};
 };
 
 /**
@@ -97,15 +97,21 @@ const calculateSteps = (moves) => {
 
   // Loop through each move in the array
   for (let move of moves) {
-    // Access the 'steps' property directly from the move object
     let steps = move.steps;
-
-    // Add the steps to the total
     totalSteps += steps;
   }
   return totalSteps;
 };
 
+/**
+ * Set the shortest path based on the start and finish coordinates plus start direction.
+ * @param startX
+ * @param startY
+ * @param finalX
+ * @param finalY
+ * @param startDirection
+ * @returns {*[]}
+ */
 const setShortestPath = (startX, startY, finalX, finalY, startDirection) => {
   let x = startX;
   let y = startY;
@@ -184,14 +190,16 @@ const setShortestPath = (startX, startY, finalX, finalY, startDirection) => {
   return alternativePath;
 };
 
-// Function to draw the alternative shortest path in green
+/**
+ * Draw the shortest path, calculated in setShortestPath.
+ * @param alternativePath
+ */
 const drawAlternativePath = (alternativePath) => {
   ctx.beginPath();
   ctx.moveTo(offsetX, offsetY); // Start from the center of the canvas
   let posX = 0;
   let posY = 0;
 
-  // Draw the alternative path based on the calculated path array
   for (const move of alternativePath) {
     const directionIndex = move.direction;
     const steps = move.steps;
@@ -204,39 +212,47 @@ const drawAlternativePath = (alternativePath) => {
     ctx.lineTo(offsetX + posX * cellSize, offsetY + posY * cellSize);
   }
 
-  ctx.strokeStyle = 'blue'; // Set the color for the alternative path
+  ctx.strokeStyle = 'blue';
   ctx.stroke();
 };
 
+/**
+ * Draw the shortest path button is disabled to start with. Once drawing begins, button is enabled.
+ */
 const updateDrawButtonState = () => {
   const drawButton = document.getElementById('drawShortestPathBtn');
   drawButton.disabled = initialPathSteps.length === 0;
 };
 
-// Function to draw the center dot
+/**
+ * Draw a red dot in the center to indicate the start coordinates
+ */
 const drawCenterDot = () => {
-  const radius = 5; // Radius of the red dot
+  const radius = 5;
   ctx.beginPath();
   ctx.arc(offsetX, offsetY, radius, 0, Math.PI * 2, false);
   ctx.fillStyle = 'red';
   ctx.fill();
   ctx.closePath();
-
-  // Apply CSS animation by temporarily creating an overlay canvas for the dot
   canvas.classList.add('centerDot');
 };
 
-// Clear the dot once the user starts drawing
+/**
+ * Clear the dot once the user starts drawing.
+ */
 const clearCenterDot = () => {
-  ctx.clearRect(offsetX - 10, offsetY - 10, 20, 20); // Clear the dot
-  canvas.classList.remove('centerDot'); // Stop the animation
+  ctx.clearRect(offsetX - 10, offsetY - 10, 20, 20);
+  canvas.classList.remove('centerDot');
 };
 
+/**
+ * Reset path to start drawing a new one.
+ */
 const resetPath = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   moves = []; // Clear all moves
-  initialPathSteps = []; // Clear the initial path steps
-  shortestPathArray = []; // Clear the shortest path
+  initialPathSteps = [];
+  shortestPathArray = [];
   shortestPath = [];
   updateDrawButtonState();
   mainPathStepsText.innerText = '';
@@ -244,7 +260,10 @@ const resetPath = () => {
   drawCenterDot();
 }
 
-// Function to simulate arrow key behavior
+/**
+ * Simulate arrow key behavior. Mainly used on mobile
+ * @param direction
+ */
 const simulateArrowKey = (direction) => {
   let move = null;
   let nextX = x;
@@ -252,24 +271,23 @@ const simulateArrowKey = (direction) => {
 
   if (!drawingStarted) {
     clearCenterDot();
-    drawingStarted = true; // Mark that drawing has started
+    drawingStarted = true;
   }
 
   if (direction === 'ArrowUp') {
-    nextY -= 1; // Check next position for North
-    move = { direction: 0, steps: 1 }; // Move north
+    nextY -= 1;
+    move = { direction: 0, steps: 1 };
   } else if (direction === 'ArrowRight') {
-    nextX += 1; // Check next position for East
-    move = { direction: 1, steps: 1 }; // Move east
+    nextX += 1;
+    move = { direction: 1, steps: 1 };
   } else if (direction === 'ArrowDown') {
-    nextY += 1; // Check next position for South
-    move = { direction: 2, steps: 1 }; // Move south
+    nextY += 1;
+    move = { direction: 2, steps: 1 };
   } else if (direction === 'ArrowLeft') {
-    nextX -= 1; // Check next position for West
-    move = { direction: 3, steps: 1 }; // Move west
+    nextX -= 1;
+    move = { direction: 3, steps: 1 };
   }
 
-  // Check if the next move would go beyond the canvas borders
   if (
       offsetX + nextX * cellSize >= 0 && offsetX + nextX * cellSize <= canvas.width &&
       offsetY + nextY * cellSize >= 0 && offsetY + nextY * cellSize <= canvas.height
@@ -280,7 +298,7 @@ const simulateArrowKey = (direction) => {
     if (move) {
       moves.push(move);
       drawPathOnCanvas();
-      finalCoordinates = calculateFinalCoordinates(moves, startDirection); // Assign the final coordinates here
+      finalCoordinates = calculateFinalCoordinates(moves); // Assign the final coordinates here
       initialPathSteps = calculateSteps(moves);
       updateDrawButtonState();
       drawingStarted = false;
@@ -297,7 +315,10 @@ const simulateArrowKey = (direction) => {
   }
 };
 
-// Handle arrow key presses to draw path
+
+/**
+ * Handle arrow key presses to draw path.
+ */
 document.addEventListener('keydown', (event) => {
   let move = null;
   let nextX = x;
@@ -305,24 +326,23 @@ document.addEventListener('keydown', (event) => {
 
   if (!drawingStarted) {
     clearCenterDot();
-    drawingStarted = true; // Mark that drawing has started
+    drawingStarted = true;
   }
 
   if (event.key === 'ArrowUp') {
-    nextY -= 1; // Check next position for North
-    move = {direction: 0, steps: 1}; // Move north
+    nextY -= 1;
+    move = {direction: 0, steps: 1};
   } else if (event.key === 'ArrowRight') {
-    nextX += 1; // Check next position for East
-    move = {direction: 1, steps: 1}; // Move east
+    nextX += 1;
+    move = {direction: 1, steps: 1};
   } else if (event.key === 'ArrowDown') {
-    nextY += 1; // Check next position for South
-    move = {direction: 2, steps: 1}; // Move south
+    nextY += 1;
+    move = {direction: 2, steps: 1};
   } else if (event.key === 'ArrowLeft') {
-    nextX -= 1; // Check next position for West
-    move = {direction: 3, steps: 1}; // Move west
+    nextX -= 1;
+    move = {direction: 3, steps: 1};
   }
 
-  // Check if the next move would go beyond the canvas borders
   if (
     offsetX + nextX * cellSize >= 0 && offsetX + nextX * cellSize <= canvas.width &&
     offsetY + nextY * cellSize >= 0 && offsetY + nextY * cellSize <= canvas.height
@@ -333,7 +353,7 @@ document.addEventListener('keydown', (event) => {
     if (move) {
       moves.push(move);
       drawPathOnCanvas();
-      finalCoordinates = calculateFinalCoordinates(moves, startDirection); // Assign the final coordinates here
+      finalCoordinates = calculateFinalCoordinates(moves);
       initialPathSteps = calculateSteps(moves);
       updateDrawButtonState();
       drawingStarted = false;
@@ -371,10 +391,17 @@ document.getElementById('arrowLeftBtn').addEventListener('click', () => {
   simulateArrowKey('ArrowLeft');
 });
 
-// On page load, draw the center dot
+document.addEventListener('touchmove', (event) => {
+  event.preventDefault();
+}, { passive: false });
+
 window.onload = () => {
   drawCenterDot();
 };
 
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
+
+window.goTo = (url) => {
+  window.open(url, '_blank');
+}
