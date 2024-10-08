@@ -30,27 +30,36 @@
 
 <!--<div id="grid" class="grid"></div>-->
 
-<div class="app-wrapper">
-  <div class="page-container">
+<div class="page-content">
+  <div class="page-header">
+    <h1>Path finder</h1>
+  </div>
 
-    <div class="page-header">
-      <h1>Path finder</h1>
-    </div>
+  <div class="page-description">
+    <h4>Path Finder is a web application that allows users to visualize paths on a canvas grid. Users can interactively
+      draw paths using the keyboard arrow keys, starting from the center of the grid. Once a path is drawn, users have
+      the option to generate the shortest path or reset the drawn paths.</h4>
+    <button class="btn-main" onclick="goTo('https://github.com/pete85/path_exercise')">Github</button>
+  </div>
 
-    <div class="page-description">
-      <h4>Path Finder is a web application that allows users to visualize paths on a canvas grid. Users can interactively
-        draw paths using the keyboard arrow keys, starting from the center of the grid. Once a path is drawn, users have
-        the option to generate the shortest path or reset the drawn paths.</h4>
-      <h4>This project demonstrates a simple interactive path visualization with real-time keyboard input and pathfinding
-        features.</h4>
-    </div>
-
-    <div class="body-container">
-      <div class="canvas-container">
-        <canvas id="gridCanvas" width="600" height="600"></canvas>
-      </div>
-
-      <div>
+  <div class="canvas-container">
+    <canvas id="gridCanvas" width="600" height="600"></canvas>
+    <div class="instructions-container">
+      <div class="legend-and-buttons-container">
+        <div class="arrow-buttons-container">
+          <button id="arrowUpBtn">
+            <i class="fa-solid fa-chevron-up"></i>
+          </button>
+          <button id="arrowLeftBtn">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button id="arrowDownBtn">
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <button id="arrowRightBtn">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
         <div class="paths-legend">
           <div class="paths-legend-item">
             <div class="paths-legend-description">
@@ -71,37 +80,15 @@
             </div>
           </div>
         </div>
-        <div class="buttons">
-          <button id="drawShortestPathBtn" disabled>Draw Shortest Path</button>
-          <button id="resetPathsBtn">Reset Paths</button>
-        </div>
-        <div class="instructions-container">
-          <div class="arrow-buttons-container">
-            <button id="arrowUpBtn">
-              <i class="fa-solid fa-chevron-up"></i>
-            </button>
-            <button id="arrowLeftBtn">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <button id="arrowDownBtn">
-              <i class="fa-solid fa-chevron-down"></i>
-            </button>
-            <button id="arrowRightBtn">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
-
-        </div>
       </div>
     </div>
-
+  </div>
+  <div class="buttons-container">
+    <button id="drawShortestPathBtn" disabled>Shortest Path</button>
+    <button id="resetPathsBtn">Reset</button>
   </div>
 </div>
-
-
-<!--<script src="js/app.js"></script>-->
 <script src="js/index.js"></script>
-
 </body>
 
 </html>
